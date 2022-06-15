@@ -1,0 +1,340 @@
+---
+title: "cyclistic_project"
+author: "Oluwadamilare Caleb Fabiyi"
+date: '2022-05-18'
+output:
+  html_document: default
+---
+
+**#Cyclistic case study: Google Data Analytics capstone project.**
+
+I decided to take this case study as my capstone project, following the completion of the Google Data Analytics certification course on coursera. I will be following the data analysis processes to generate insights from these data.
+
+The data was made available by Motivate International Inc. under this [license](https://www.divvybikes.com/data-license-agreement), so I have been granted a non-exclusive, royalty-free, limited, perpetual license to access, reproduce, analyze, copy, modify, distribute in my product or service and to use the data for any lawful purpose.
+
+**#My project description.**
+
+I am a junior data analyst at Cyclistic a company that launched a successful bike-share offering in 2016. The program has up to a fleet of 5,824 bicycles that are geo-tracked and locked into a network of 692 stations across Chicago.
+
+These bikes can be unlocked from one station and returned to any other station in the system anytime.
+
+**#PHASES OF ANALYSIS**
+
+**##Ask phase**
+
+*The business task is clear:*
+
+I will be analyzing our company's historical bike trip data to identify trends to discover how annual Members and Casual riders use Cyclistic's bikes differently.
+
+I will use insights from this data to discover why casual riders would prefer to buy Cyclistic annual memberships.
+
+I will from this data design a new marketing strategy to convert casual users to annual members.
+
+I will recommend how Cyclistic can use digital media to influence casual riders to become members.
+
+The stakeholders interested in my analysis are Lily Moreno, our manager in our team of data analyst and the director of marketing at cyclistic who is responsible for the development of campaigns and initiatives to promote the bike-share program, and the higher executive team in charge of making decisions for the company.
+
+**##Prepare phase**
+
+I was able to get the compressed zip files of the historical data stored on our online storage, This data is of high integrity and credibility as it is a primary data from our company's online data storage.
+
+I downloaded the zip files for the data for the past 12 months, May 2021 to April 2022.
+
+This data will assist me in this task because it contains details of the rides of both casual riders and members for 12 months.
+
+I downloaded the data, extracted the csv files from the zip folders and organize them appropriately for the process.
+
+**##Process phase**
+
+I decided to use Rstudio desktop for my analysis because after extracting the dataset, I discovered they were too heavy to start transferring into Rstudio cloud, the data was also too large to be used in Excel or google sheets, Rstudio will enable me to perform all analysis and I chose it over bigquery because of the advantage of data visualization.
+
+I loaded the necessary packages into Rstudio.
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(readr)
+library(skimr)
+library(janitor)
+library(stringr)
+library(lubridate)
+library(tinytex)
+```
+
+I set up the working directory into the folder where my data were stored. I then loaded my data into my workspace using the read csv function.
+
+```{r}
+setwd("~/Data Analytics/Projects/Cyclist_Project/cyclist_project_data/csv_data")
+df_may_2021 <- read.csv("202105-divvy-tripdata.csv")
+df_june_2021 <- read.csv("202106-divvy-tripdata.csv")
+df_july_2021 <- read.csv("202107-divvy-tripdata.csv")
+df_august_2021 <- read.csv("202108-divvy-tripdata.csv")
+df_september_2021 <- read.csv("202109-divvy-tripdata.csv")
+df_october_2021 <- read.csv("202110-divvy-tripdata.csv")
+df_november_2021 <- read.csv("202111-divvy-tripdata.csv")
+df_december_2021 <- read.csv("202112-divvy-tripdata.csv")
+df_january_2022 <- read.csv("202201-divvy-tripdata.csv")
+df_february_2022 <- read.csv("202202-divvy-tripdata.csv")
+df_march_2022 <- read.csv("202203-divvy-tripdata.csv")
+df_april_2022 <- read.csv("202204-divvy-tripdata.csv")
+```
+
+I previewed the names of the different function by using the colnames function and I discovered that all the column headers were uniform.
+
+```{r}
+colnames(df_may_2021)
+colnames(df_june_2021)
+colnames(df_july_2021)
+colnames(df_august_2021)
+colnames(df_september_2021)
+colnames(df_october_2021)
+colnames(df_november_2021)
+colnames(df_december_2021)
+colnames(df_january_2022)
+colnames(df_february_2022)
+colnames(df_march_2022)
+colnames(df_april_2022)
+```
+
+I also previewed the data using the glimpse function and I discovered that the started_at and ended_at columns appeared as a string datatype instead of datetime datatype.
+
+```{r}
+glimpse(df_may_2021)
+glimpse(df_june_2021)
+glimpse(df_july_2021)
+glimpse(df_august_2021)
+glimpse(df_september_2021)
+glimpse(df_october_2021)
+glimpse(df_november_2021)
+glimpse(df_december_2021)
+glimpse(df_january_2022)
+glimpse(df_february_2022)
+glimpse(df_march_2022)
+glimpse(df_april_2022)
+```
+
+I converted them into datetime datatype using the mutate and as_datetime function.
+
+```{r}
+df_may_2021 <- mutate(df_may_2021, started_at = as_datetime(started_at), ended_at = as_datetime(ended_at))
+df_june_2021 <- mutate(df_june_2021, started_at = as_datetime(started_at), ended_at = as_datetime(ended_at))
+df_july_2021 <- mutate(df_july_2021, started_at = as_datetime(started_at), ended_at = as_datetime(ended_at))
+df_august_2021 <- mutate(df_august_2021, started_at = as_datetime(started_at), ended_at = as_datetime(ended_at))
+df_september_2021 <- mutate(df_september_2021, started_at = as_datetime(started_at), ended_at = as_datetime(ended_at)) 
+df_october_2021 <- mutate(df_october_2021, started_at = as_datetime(started_at), ended_at = as_datetime(ended_at))
+df_november_2021 <- mutate(df_november_2021, started_at = as_datetime(started_at), ended_at = as_datetime(ended_at))
+df_december_2021 <- mutate(df_december_2021, started_at = as_datetime(started_at), ended_at = as_datetime(ended_at))
+df_january_2022 <- mutate(df_january_2022, started_at = as_datetime(started_at), ended_at = as_datetime(ended_at))
+df_february_2022 <- mutate(df_february_2022, started_at = as_datetime(started_at), ended_at = as_datetime(ended_at))
+df_march_2022 <- mutate(df_march_2022, started_at = as_datetime(started_at), ended_at = as_datetime(ended_at))
+df_april_2022 <- mutate(df_april_2022, started_at = as_datetime(started_at), ended_at = as_datetime(ended_at))
+glimpse(df_may_2021)
+```
+
+After running the glimpse function again and seeing the consistency of the datatype in the 12 months data. This means that my data is clean and ready for further cleaning and analysis.
+
+```{r}
+glimpse(df_may_2021)
+glimpse(df_june_2021)
+glimpse(df_july_2021)
+glimpse(df_august_2021)
+glimpse(df_september_2021)
+glimpse(df_october_2021)
+glimpse(df_november_2021)
+glimpse(df_december_2021)
+glimpse(df_january_2022)
+glimpse(df_february_2022)
+glimpse(df_march_2022)
+glimpse(df_april_2022)
+```
+
+All my data cleaning processes were recorded and stored for better accessibility by team and error tracing.
+
+I decided to transform my data by joining all the data together for all the months for better analysis.
+
+```{r}
+total_rides <- bind_rows(df_may_2021, df_june_2021, df_july_2021, df_august_2021, df_september_2021, df_october_2021, df_november_2021, df_december_2021, df_january_2022, df_february_2022, df_march_2022, df_april_2022)
+glimpse(total_rides)
+```
+
+After this transformation, I decided to inspect my data again, by running functions that will summarize my new table.
+
+```{r}
+head(total_rides)
+summary(total_rides)
+```
+
+I found out that, there are 5,757,551 and 13 columns in my new table and all columns have the right datatype.
+
+I also had an overview of some statistical results from the tables gotten from the summary function.
+
+I created a new column(ride_length) for ride length to determine the number of seconds spent by each rider.
+
+```{r}
+total_rides$ride_length <- difftime(total_rides$ended_at, total_rides$started_at)
+```
+
+I created a new column for the day of the week when the ride started. (day_of_week)
+
+```{r}
+total_rides$day_of_week <- weekdays(as.Date(total_rides$started_at))
+```
+
+I used the str() and View() function to preview my data and check the consistency.
+
+```{r}
+str(total_rides)
+```
+
+I noticed that the ride_length was not in the numeric datatype and cannot be use to perform calculations. So I converted it to numeric.
+
+```{r}
+total_rides$ride_length <- as.numeric(as.character(total_rides$ride_length))
+```
+
+I confirmed it using the str() function and it was already in numeric.
+
+```{r}
+str(total_rides)
+```
+
+I decided to check if there was any ride_length that was negative, as this could only be cause by an error in data collection.
+
+```{r}
+total_rides %>% 
+  filter(started_at > ended_at)
+```
+
+I discovered that there are 140 negative ride lengths, I informed Lily Moreno and she told me to remove them, I decided to filter out the remaining into another data frame by removing the bad data.
+
+```{r}
+total_rides_2 <- total_rides %>% 
+  filter(started_at < ended_at)
+```
+
+I filtered out my new dataframe and I ran the glimpse function where I previewed my data to have 5,756,899 rows and 15 columns.
+
+```{r}
+glimpse(total_rides_2)
+
+```
+
+I decided to remove null values using the na.omit function, after removing null values I had 5,752,133 rows and 15 columns left.
+
+```{r}
+total_rides_2 <- total_rides_2 %>% na.omit()
+
+```
+
+**##Analyze phase**
+
+I decided to compare the mean, median, max and min of the ride_length of both the members and casual users.
+
+```{r}
+aggregate(total_rides_2$ride_length ~ total_rides_2$member_casual, FUN = mean)
+aggregate(total_rides_2$ride_length ~ total_rides_2$member_casual, FUN = median)
+aggregate(total_rides_2$ride_length ~ total_rides_2$member_casual, FUN = max)
+aggregate(total_rides_2$ride_length ~ total_rides_2$member_casual, FUN = min)
+```
+
+I discovered that casual users generally ride for a longer time than members.
+
+I also did some statistical anlalysis on the average ride_length was 1,200.465 seconds, the median was 690 seconds, the maximum ride_length was 3,356,649 seconds, the minimum ride_length was 1 second.
+
+```{r}
+total_rides_2 %>% 
+  summarise(mean=mean(ride_length), max=max(ride_length), median=median(ride_length), min=min(ride_length))
+```
+
+*###Visualization*
+
+I observed and compared the users count using a bar chart.
+
+*I discovered:*
+
+There were 5,752,133 total rides from May 2021 to April 2022
+
+There were more Member users rides (2,532,243) than Casual users rides (3,219,890).
+
+```{r}
+ggplot(data = total_rides_2) +
+  geom_bar(mapping = aes(x=member_casual, fill=member_casual)) + 
+  labs(title = "Count of Members and Casual users", subtitle = "Casual = 2,532,243 and Member = 3,219,890" , x= "User type", y= "Count")
+```
+
+I compared the users count on the basis of ride_type using a bar chart to to see any preference.
+
+*I discovered:*
+
+Both member and casual users prefer Classic bikes and electric bikes to docked bikes.
+
+Member are not riding using docked bikes.
+
+```{r}
+ggplot(data = total_rides_2) +
+  geom_bar(mapping = aes(x=rideable_type, fill=rideable_type)) +
+  facet_wrap(~member_casual) +
+  labs(title = "Count of Members and Casual users based on ride type", subtitle = "Classic_bike = 3,198,351 and Docked_bike = 290_782 and Electric_bike = 2,263,000", x = "Ride type", y = "Count")
+```
+
+I plotted a column chart to compare the usage of the bike by member and casual riders by days of the week.
+
+*I discovered:*
+
+There are more Casual users than Member users during weekends.
+
+There is a relatively high usage by member users during working days (Monday to Fridays)
+
+```{r}
+total_rides_2$day_of_week <- ordered(total_rides_2$day_of_week, levels=c("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"))
+total_rides_2 %>% 
+  group_by(member_casual,day_of_week ) %>% 
+  summarize(number_of_rides = n(), average_duration = mean(ride_length)) %>%
+  arrange(member_casual, day_of_week) %>% 
+  ggplot(aes(x = day_of_week, y = number_of_rides, fill=member_casual)) +
+  geom_col(position = "dodge") +
+  labs(title = "Number of rides by Members or Casual users by days of the week", x = "Day of the week", y = "Number of rides")
+```
+
+I plotted a column chart to compare the usage of bike by members and casual riders by months of the year.
+
+*I discovered:*
+
+Casual users are not patronizing bikeshare early in the year (January to April) and late in the year (November and December)
+
+There is also a generally low patronage in the beginning and end of the year.
+
+There is a surge in rides by Casual users that surpasses those of member users from June to August, this might be due to awareness by marketing efforts.
+
+```{r}
+total_rides_2 %>% 
+  mutate(month = month(started_at, label = TRUE)) %>% 
+  group_by(member_casual,month) %>%
+  summarize(number_of_rides=n(), average_duration=mean(ride_length)) %>%
+  arrange(member_casual,month) %>% 
+  ggplot(aes(x=month, y=number_of_rides, fill=member_casual)) +
+  geom_col(position = "dodge") +
+  labs(title = "Number of rides by Members or Casual users by months", x= "Month", y = "Number of rides")
+```
+
+**##Share phase**
+
+*I arrived at 3 main conclusions.*
+
+*A lot Casual riders prefer weekend rides.
+
+*There is a very low marketing effort at the beginning and end of the year.
+
+*Users prefer Electric and classic bikes to docked bikes.
+
+I made a power point presentation to ny stakeholders. Check [here] (https://docs.google.com/presentation/d/1DjFJxeWhENZTtanapJku7zDVY-LXHLhL/edit?usp=drivesdk&ouid=116003460290509961402&rtpof=true&sd=true)
+
+**##Act phase**
+
+*My recommendations are*
+
+*The company should prepare a discounted membership package that will be exclusive for weekends usage.
+
+*The company should intensify marketing and promotion efforts at the beginning and end of the year, we should also promote the new weekend membership packages during weekends.
+
+*The company should purchase more electric bikes and classic bikes and use them in digital media for promotion of their new membership package.
